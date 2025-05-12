@@ -10,6 +10,12 @@ const app = express();
 
 
 app.use(cors());
+
+app.use(cors({
+    origin: 'https://minionkevin.github.io/web-2048/' 
+  }));
+
+
 app.use(bodyParser.json());
 
 
