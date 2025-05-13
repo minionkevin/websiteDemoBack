@@ -12,7 +12,7 @@ const app = express();
 app.use(cors());
 
 app.use(cors({
-    origin: 'https://minionkevin.github.io/web-2048/' 
+    origin: 'https://minionkevin.github.io/Game-2048/' 
   }));
 
 
