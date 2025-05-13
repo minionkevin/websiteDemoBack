@@ -7,10 +7,11 @@ const jwt = require('jsonwebtoken');
 const secret = "my_test_token";
 
 const app = express();
-
+const isDev = process.env.NODE_ENV !== 'production';
 
 app.use(cors({
-    origin: 'https://minionkevin.github.io' 
+  origin: isDev ? 'http://localhost:4200' : 'https://minionkevin.github.io',
+  credentials: true
   }));
 
 
@@ -18,6 +19,7 @@ app.use(bodyParser.json());
 
 
 app.post('/signup', async (req, res) => {
+
   const { username, password } = req.body;  // 获取请求体中的用户名和密码
 
   // 输入验证
@@ -83,6 +85,16 @@ app.post('/login', async (req, res) => {
     }
 });
 
+app.get('/test-db', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT NOW()');
+    res.send(`Database time: ${result.rows[0].now}`);
+  } catch (err) {
+    console.error('Database error:', err);
+    res.status(500).send('Database connection failed.');
+  }
+});
+
 app.post('/update-score',async(req,res)=>{
     const {username,score} = req.body;
 
@@ -124,19 +136,6 @@ app.get('/leaderboard', async (req, res) => {
       }
   
       res.json({ topTen: topTenResult.rows, currentUser });
-    } catch (err) {
-      console.error('Error fetching leaderboard:', err);
-      res.status(500).json({ message: 'Server error' });
-    }
-  });
-
-app.get('/guest-leaderboard', async (req, res) => {
-    try {
-      const topTenResult = await pool.query(
-        'SELECT username, highest_score FROM users ORDER BY highest_score DESC LIMIT 10'
-      );
-
-      res.json({ topTen: topTenResult.rows });
     } catch (err) {
       console.error('Error fetching leaderboard:', err);
       res.status(500).json({ message: 'Server error' });
